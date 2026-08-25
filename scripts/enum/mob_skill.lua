@@ -166,6 +166,8 @@ xi.mobSkill =
     BERSERK_DHALMEL               =  286,
     HEALING_BREEZE                =  287,
 
+    WHISTLE_CALL                  =  293,
+
     ENTANGLE_DRAIN                =  299,
     HEAD_BUTT_1                   =  300,
     DREAM_FLOWER_1                =  301,
@@ -719,6 +721,7 @@ xi.mobSkill =
     OBLIVION_SMASH_2              = 1133,
     TERA_SLASH_1                  = 1134,
     TERA_SLASH_2                  = 1135,
+    PET_CHARM                     = 1142,
 
     EES_KINDRED                   = 1151,
 
@@ -975,7 +978,21 @@ xi.mobSkill =
     ENERGY_SCREEN                 = 1522,
     MANA_SCREEN                   = 1523,
     DISSIPATION                   = 1524,
+    GUIDED_MISSILE_II             = 1525,
+    COLOSSAL_BLOW                 = 1526,
+    LASER_SHOWER                  = 1527,
+    FLOODLIGHT                    = 1528,
+    HYPER_PULSE_2                 = 1529,
+    STUN_CANNON                   = 1530,
 
+    POD_EJECTION                  = 1532,
+    PILE_PITCH_2                  = 1533,
+    GUIDED_MISSILE_2              = 1534,
+    HYPER_PULSE_3                 = 1535,
+    TARGET_ANALYSIS_2             = 1536,
+    DISCHARGER_2                  = 1537,
+    ION_EFFLUX_2                  = 1538,
+    REAR_LASERS_2                 = 1539,
     CITADEL_BUSTER                = 1540,
 
     TRAMPLE_BAHAMUT               = 1542,

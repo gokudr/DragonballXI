@@ -19687,7 +19687,9 @@ void CLuaBaseEntity::setDropID(uint32 dropID)
 
     auto* PMob = static_cast<CMobEntity*>(m_PBaseEntity);
 
-    PMob->m_DropID = dropID;
+    // A numbered list replaces whatever the mob's own data gave it.
+    PMob->m_DropID   = dropID;
+    PMob->m_DropList = nullptr;
 }
 
 /************************************************************************
@@ -19768,7 +19770,7 @@ uint16 CLuaBaseEntity::getStealItem()
 
     if (PMob)
     {
-        DropList_t* PDropList = itemutils::GetDropList(PMob->m_DropID);
+        const DropList_t* PDropList = PMob->dropList();
 
         if (PDropList && !PMob->m_ItemStolen)
         {
@@ -19809,7 +19811,7 @@ uint16 CLuaBaseEntity::getDespoilItem()
         return 0;
     }
 
-    DropList_t* PDropList = itemutils::GetDropList(PMob->m_DropID);
+    const DropList_t* PDropList = PMob->dropList();
 
     if (PDropList && !PMob->m_ItemDespoiled)
     {
