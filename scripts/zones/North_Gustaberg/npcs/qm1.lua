@@ -16,7 +16,8 @@ entity.onEventFinish = function(player, csid, option, npc)
     if csid == 10 and option == 0 then
         if
             player:getEquipID(xi.slot.MAIN) == 0 and
-            player:getEquipID(xi.slot.SUB) == 0
+            player:getEquipID(xi.slot.SUB) == 0 and
+            player:getEquipID(xi.slot.RANGED) == 0
         then
             if player:hasItem(xi.item.SIRENS_TEAR) or player:getFreeSlotsCount() == 0 then
                 player:messageSpecial(ID.text.SHINING_OBJECT_SLIPS_AWAY)
