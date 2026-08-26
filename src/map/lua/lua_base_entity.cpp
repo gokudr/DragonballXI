@@ -1,4 +1,4 @@
-﻿/*
+/*
 ===========================================================================
 
   Copyright (c) 2010-2015 Darkstar Dev Teams
@@ -13782,9 +13782,12 @@ void CLuaBaseEntity::updateEnmity(CLuaBaseEntity* PEntity)
         return;
     }
 
-    if (PEntity != nullptr && PEntity->GetBaseEntity()->objtype != TYPE_NPC)
+    if (auto* PBattleEntity = dynamic_cast<CBattleEntity*>(m_PBaseEntity); PBattleEntity && !PBattleEntity->isDead())
     {
-        m_PBaseEntity->PAI->Engage(PEntity->GetBaseEntity()->entityId());
+        if (PEntity != nullptr && PEntity->GetBaseEntity()->objtype != TYPE_NPC)
+        {
+            m_PBaseEntity->PAI->Engage(PEntity->GetBaseEntity()->entityId());
+        }
     }
 }
 
