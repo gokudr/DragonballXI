@@ -107,17 +107,18 @@ xi.settings.main =
     ABYSSEA_BONUSLIGHT_AMOUNT = 0,
 
     -- CHARACTER CONFIG
-    INITIAL_LEVEL_CAP              = 50, -- The initial level cap for new players.  There seems to be a hardcap of 255.
-    MAX_LEVEL                      = 99, -- Level max of the server, lowers the attainable cap by disabling Limit Break quests.
-    NORMAL_MOB_MAX_LEVEL_RANGE_MIN = 0,  -- Lower Bound of Max Level Range for Normal Mobs (0 = Uncapped)
-    NORMAL_MOB_MAX_LEVEL_RANGE_MAX = 0,  -- Upper Bound of Max Level Range for Normal Mobs (0 = Uncapped)
-    START_GIL                      = 10, -- Amount of gil given to newly created characters.
-    START_INVENTORY                = 30, -- Starting inventory and satchel size.  Ignores values < 30.  Do not set above 80!
-    NEW_CHARACTER_CUTSCENE         = 1,  -- Set to 1 to enable opening cutscenes, 0 to disable.
-    SUBJOB_QUEST_LEVEL             = 18, -- Minimum level to accept either subjob quest.  Set to 0 to start the game with subjobs unlocked.
-    ADVANCED_JOB_LEVEL             = 30, -- Minimum level to accept advanced job quests.  Set to 0 to start the game with advanced jobs.
-    ALL_MAPS                       = 0,  -- Set to 1 to give starting characters all the maps.
-    UNLOCK_OUTPOST_WARPS           = 0,  -- Set to 1 to give starting characters all outpost warps.  2 to add Tu'Lia and Tavnazia.
+    INITIAL_LEVEL_CAP              = 50,  -- The initial level cap for new players.  There seems to be a hardcap of 255.
+    MAX_LEVEL                      = 99,  -- Level max of the server, lowers the attainable cap by disabling Limit Break quests.
+    NORMAL_MOB_MAX_LEVEL_RANGE_MIN = 0,   -- Lower Bound of Max Level Range for Normal Mobs (0 = Uncapped)
+    NORMAL_MOB_MAX_LEVEL_RANGE_MAX = 0,   -- Upper Bound of Max Level Range for Normal Mobs (0 = Uncapped)
+    START_GIL                      = 10,  -- Amount of gil given to newly created characters.
+    START_INVENTORY                = 30,  -- Starting inventory and satchel size.  Ignores values < 30.  Do not set above 80!
+    NEW_CHARACTER_CUTSCENE         = 1,   -- Set to 1 to enable opening cutscenes, 0 to disable.
+    NEW_ADVENTURER_PLAYTIME_LIMIT  = 240, -- Hours played before the New Adventurer icon is removed. 240 for retail, 10 for pre-TVR.
+    SUBJOB_QUEST_LEVEL             = 18,  -- Minimum level to accept either subjob quest.  Set to 0 to start the game with subjobs unlocked.
+    ADVANCED_JOB_LEVEL             = 30,  -- Minimum level to accept advanced job quests.  Set to 0 to start the game with advanced jobs.
+    ALL_MAPS                       = 0,   -- Set to 1 to give starting characters all the maps.
+    UNLOCK_OUTPOST_WARPS           = 0,   -- Set to 1 to give starting characters all outpost warps.  2 to add Tu'Lia and Tavnazia.
 
     SHOP_PRICE          = 1.000, -- Multiplies prices in NPC shops.
     GIL_RATE            = 1.000, -- Multiplies gil earned from quests.  Won't always display in game.
@@ -137,6 +138,10 @@ xi.settings.main =
     ITEM_POWER          = 1.000, -- Multiplies the effect of items such as Potions and Ethers.
     WEAPON_SKILL_POWER  = 1.000, -- Multiplies damage dealt by Weapon Skills.
     DELAY_REDUCTION_CAP = 0.80,  -- Set the cap for melee swing haste effect. (0.80 = 80% retail delay reduction max, 0.93 = 93% ToAU delay reduction max)
+
+    -- When true, use 8 + Blue magic skill + STR*ONE_HAND_MAIN_HAND_STR_ATTACK_MULTIPLIER for base attack (before blue magic merits) instead of current retail's "fetch main hand weapon attack" style
+    -- see xi.spells.blue.getBlueMagicBaseAttack
+    BLUE_SKILL_IS_BLUE_ATTACK = false,
 
     -- STR:ATT/RATT ratios. For players only. Mobs are hardcoded to 0.5
     TWO_HANDED_STR_ATTACK_MULTIPLIER         = 1.0,  -- 1.0: 1 STR = 1 Attack. This has been 0.5 and 0.75 in previous eras
@@ -193,17 +198,14 @@ xi.settings.main =
     -- SE implemented coffer/chest illusion time in order to prevent coffer farming. No-one in the same area can open a chest or coffer for loot (gil, gems & items)
     -- till a random time between MIN_ILLSION_TIME and MAX_ILLUSION_TIME. During this time players can loot keyitem and item related to quests (AF, maps... etc.)
     COFFER_MAX_ILLUSION_TIME = 3600,  -- 1 hour
-    COFFER_MIN_ILLUSION_TIME = 1800,  -- 30 minutes
+    COFFER_MIN_ILLUSION_TIME =  900,  -- 15 minutes
     CHEST_MAX_ILLUSION_TIME  = 3600,  -- 1 hour
-    CHEST_MIN_ILLUSION_TIME  = 1800,  -- 30 minutes
+    CHEST_MIN_ILLUSION_TIME  =  900,  -- 15 minutes
 
     -- Multiplier to NM lottery spawn chance. (Default 1.0) eg. 0 = disable lottery spawns. -1 for always 100% chance.
     NM_LOTTERY_CHANCE = 1.0,
     -- Multiplier to NM lottery cooldown time (Default 1.0) eg. 2.0 = twice as long. 0 = no cooldowns.
     NM_LOTTERY_COOLDOWN = 1.0,
-
-    -- CONQUEST SETTINGS
-    CONQUEST_INFLUENCE_CAP = 250000, -- Combined influence pool per region shared across the 4 nations. Ceiling is 20 million.
 
     -- GARRISON SETTINGS
     ENABLE_GARRISON        = true,  -- If true, enables garrison functionality

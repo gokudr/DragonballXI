@@ -26,26 +26,26 @@ CREATE TABLE `mob_spawn_points` (
 -- ------------------------------------------------------------
 
 -- Golden Salvage
-INSERT INTO `mob_spawn_points` VALUES (17002497,0,'Percipient_Fish','Percipient Fish',1,81,82,364.000,-5.000,99.000,33,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17002498,0,'Percipient_Fish','Percipient Fish',1,81,82,343.000,-5.000,99.000,94,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17002499,0,'Percipient_Fish','Percipient Fish',1,81,82,338.000,-6.000,67.000,90,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17002500,0,'Percipient_Fish','Percipient Fish',1,81,82,302.000,-6.000,50.000,41,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17002501,0,'Percipient_Fish','Percipient Fish',1,81,82,256.000,-1.000,22.000,41,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17002502,0,'Percipient_Fish','Percipient Fish',1,81,82,223.000,-2.000,-21.000,41,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17002503,0,'Percipient_Fish','Percipient Fish',1,81,82,295.000,-4.000,-14.000,41,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17002504,0,'Percipient_Fish','Percipient Fish',1,81,82,313.000,-6.000,-16.000,41,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17002505,0,'Cursed_Chest','Cursed Chest',2,73,75,509.000,-7.000,100.000,192,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17002506,0,'Cursed_Chest','Cursed Chest',2,73,75,590.000,-15.000,103.000,127,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17002507,0,'Cursed_Chest','Cursed Chest',2,73,75,346.000,-2.000,113.000,49,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17002508,0,'Cursed_Chest','Cursed Chest',2,73,75,351.000,-15.000,-14.000,134,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17002509,0,'Cursed_Chest','Cursed Chest',2,73,75,305.000,-7.000,-56.000,249,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17002510,0,'Cursed_Chest','Cursed Chest',2,73,75,288.000,-15.000,-105.000,248,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17002511,0,'Cursed_Chest','Cursed Chest',2,73,75,331.000,-15.000,-181.000,202,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17002512,0,'Cursed_Chest','Cursed Chest',2,73,75,434.000,-7.000,-123.000,103,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17002513,0,'Cursed_Chest','Cursed Chest',2,73,75,330.000,-3.000,-34.000,163,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17002514,0,'Cursed_Chest','Cursed Chest',2,73,75,472.000,-7.000,228.000,96,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17002515,0,'Cursed_Chest','Cursed Chest',2,73,75,221.000,-1.000,-32.000,226,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17002516,0,'Cursed_Chest','Cursed Chest',2,73,75,546.000,-7.000,161.000,156,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17002497,0,'Percipient_Fish','Percipient Fish',1,81,82,260.272,-2.000,24.269,0,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17002498,0,'Percipient_Fish','Percipient Fish',1,81,82,309.655,-7.136,56.875,0,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17002499,0,'Percipient_Fish','Percipient Fish',1,81,82,300.966,-3.209,67.613,0,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17002500,0,'Percipient_Fish','Percipient Fish',1,81,82,340.193,-5.315,92.964,0,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17002501,0,'Percipient_Fish','Percipient Fish',1,81,82,399.113,-7.000,135.454,0,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17002502,0,'Percipient_Fish','Percipient Fish',1,81,82,462.867,-3.655,142.684,0,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17002503,0,'Percipient_Fish','Percipient Fish',1,81,82,542.181,-6.000,168.428,0,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17002504,0,'Percipient_Fish','Percipient Fish',1,81,82,535.110,-4.000,170.383,0,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17002505,0,'Cursed_Chest','Cursed Chest',2,73,75,1.000,0.000,0.000,0,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17002506,0,'Cursed_Chest','Cursed Chest',2,73,75,1.000,0.000,0.000,0,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17002507,0,'Cursed_Chest','Cursed Chest',2,73,75,1.000,0.000,0.000,0,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17002508,0,'Cursed_Chest','Cursed Chest',2,73,75,1.000,0.000,0.000,0,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17002509,0,'Cursed_Chest','Cursed Chest',2,73,75,1.000,0.000,0.000,0,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17002510,0,'Cursed_Chest','Cursed Chest',2,73,75,1.000,0.000,0.000,0,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17002511,0,'Cursed_Chest','Cursed Chest',2,73,75,1.000,0.000,0.000,0,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17002512,0,'Cursed_Chest','Cursed Chest',2,73,75,1.000,0.000,0.000,0,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17002513,0,'Cursed_Chest','Cursed Chest',2,73,75,1.000,0.000,0.000,0,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17002514,0,'Cursed_Chest','Cursed Chest',2,73,75,1.000,0.000,0.000,0,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17002515,0,'Cursed_Chest','Cursed Chest',2,73,75,1.000,0.000,0.000,0,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17002516,0,'Cursed_Chest','Cursed Chest',2,73,75,1.000,0.000,0.000,0,NULL,NULL);
 
 -- lamia 13
 INSERT INTO `mob_spawn_points` VALUES (17002517,0,'Lamia_No13','Lamia No.13',3,77,78,24.381,-4.094,-209.261,42,NULL,NULL);
@@ -198,7 +198,7 @@ INSERT INTO `mob_spawn_points` VALUES (17006593,0,'Excaliace','Excaliace',1,75,7
 INSERT INTO `mob_spawn_points` VALUES (17006594,0,'Arrapago_Crab','Arrapago Crab',2,72,74,-377.359,-15.778,297.049,162,NULL,NULL);
 INSERT INTO `mob_spawn_points` VALUES (17006595,0,'Arrapago_Crab','Arrapago Crab',2,72,74,-372.792,-15.869,299.414,169,NULL,NULL);
 INSERT INTO `mob_spawn_points` VALUES (17006596,0,'Arrapago_Crab','Arrapago Crab',2,72,74,-382.212,-15.736,300.797,1,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17006597,0,'Arrapago_Crab','Arrapago Crab',2,72,74,-296.028,-15.806,26.763,255,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17006597,0,'Arrapago_Crab','Arrapago Crab',2,72,74,-296.028,-15.806,266.763,255,NULL,NULL);
 INSERT INTO `mob_spawn_points` VALUES (17006598,0,'Arrapago_Crab','Arrapago Crab',2,72,74,-302.256,-15.765,259.201,186,NULL,NULL);
 INSERT INTO `mob_spawn_points` VALUES (17006599,0,'Arrapago_Crab','Arrapago Crab',2,72,74,-302.615,-15.774,256.504,12,NULL,NULL);
 INSERT INTO `mob_spawn_points` VALUES (17006600,0,'Arrapago_Crab','Arrapago Crab',2,72,74,-380.292,-15.769,221.872,100,NULL,NULL);
@@ -215,29 +215,29 @@ INSERT INTO `mob_spawn_points` VALUES (17006610,0,'Debaucher','Debaucher',3,77,7
 INSERT INTO `mob_spawn_points` VALUES (17006611,0,'Debaucher','Debaucher',3,77,79,-472.284,-10.180,-65.855,118,NULL,NULL);
 
 -- Requiem assault entrance @ -470 -9.695 -325 rot 192
-INSERT INTO `mob_spawn_points` VALUES (17006612,0,'Putrid_Immortal_Guard','Putrid Immortal Guard',5,77,78,-434.051,-5.076,-260.724,0,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17006613,0,'Putrid_Immortal_Guard','Putrid Immortal Guard',5,77,78,-455.689,-8.171,-265.212,60,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17006614,0,'Batteilant_Bhoot','Batteilant Bhoot',6,77,78,-510.939,-16.193,-178.466,86,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17006615,0,'Batteilant_Bhoot','Batteilant Bhoot',6,77,78,-508.779,-16.297,-175.037,110,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17006616,0,'Darkling_Draugar','Darkling Draugar',7,77,78,-509.631,-18.504,-142.899,5,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17006617,0,'Draconic_Draugar','Draconic Draugar',8,77,78,-504.532,-15.733,-143.145,146,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17006618,0,'Draugars_Wyvern','Draugar\'s Wyvern',9,77,78,-504.532,-15.733,-143.145,146,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17006619,0,'Darkling_Draugar','Darkling Draugar',7,77,78,-544.832,-16.103,-142.699,253,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17006620,0,'Darkling_Draugar','Darkling Draugar',7,77,78,-535.468,-15.760,-142.838,238,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17006621,0,'Draconic_Draugar','Draconic Draugar',8,77,78,-531.053,-16.308,-209.619,254,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17006622,0,'Draugars_Wyvern','Draugar\'s Wyvern',9,77,78,-531.053,-16.308,-209.619,254,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17006623,0,'Draconic_Draugar','Draconic Draugar',8,77,78,-536.109,-15.914,-209.807,181,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17006624,0,'Draugars_Wyvern','Draugar\'s Wyvern',9,77,78,-536.109,-15.914,-209.807,181,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17006625,0,'Batteilant_Bhoot','Batteilant Bhoot',6,77,78,-389.755,-16.314,-340.165,26,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17006626,0,'Batteilant_Bhoot','Batteilant Bhoot',6,77,78,-380.747,-16.141,-339.757,227,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17006627,0,'Darkling_Draugar','Darkling Draugar',7,77,78,-421.740,-15.771,-414.019,85,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17006628,0,'Draconic_Draugar','Draconic Draugar',8,77,78,-410.189,-18.512,-417.184,128,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17006629,0,'Draugars_Wyvern','Draugar\'s Wyvern',9,77,78,-410.189,-18.512,-417.184,128,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17006630,0,'Darkling_Draugar','Darkling Draugar',7,77,78,-380.327,-15.837,-372.303,69,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17006631,0,'Draconic_Draugar','Draconic Draugar',8,77,78,-373.480,-17.073,-377.010,128,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17006632,0,'Draugars_Wyvern','Draugar\'s Wyvern',9,77,78,-373.480,-17.073,-377.010,128,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17006633,0,'Darkling_Draugar','Darkling Draugar',7,77,78,-345.461,-15.811,-330.613,116,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17006634,0,'Darkling_Draugar','Darkling Draugar',7,77,78,-348.444,-17.535,-337.023,129,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17006612,0,'Putrid_Immortal_Guard','Putrid Immortal Guard',5,77,77,-454.915,-4.121,-255.058,78,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17006613,0,'Putrid_Immortal_Guard','Putrid Immortal Guard',5,77,77,-450.889,-6.673,-258.272,3,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17006614,0,'Batteilant_Bhoot','Batteilant Bhoot',6,75,77,-499.716,-16.174,-179.635,65,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17006615,0,'Batteilant_Bhoot','Batteilant Bhoot',6,75,77,-499.622,-16.164,-180.989,50,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17006616,0,'Darkling_Draugar','Darkling Draugar',7,75,76,-500.338,-15.800,-145.716,255,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17006617,0,'Draconic_Draugar','Draconic Draugar',8,75,76,-501.451,-15.801,-145.041,153,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17006618,0,'Draugars_Wyvern','Draugar\'s Wyvern',9,70,71,-501.451,-15.801,-145.041,153,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17006619,0,'Darkling_Draugar','Darkling Draugar',7,75,76,-538.905,-15.775,-146.001,13,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17006620,0,'Darkling_Draugar','Darkling Draugar',7,75,76,-538.621,-16.070,-143.620,24,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17006621,0,'Draconic_Draugar','Draconic Draugar',8,75,76,-534.770,-15.908,-212.742,253,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17006622,0,'Draugars_Wyvern','Draugar\'s Wyvern',9,70,71,-534.770,-15.908,-212.742,253,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17006623,0,'Draconic_Draugar','Draconic Draugar',8,75,76,-537.336,-15.916,-212.358,141,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17006624,0,'Draugars_Wyvern','Draugar\'s Wyvern',9,70,71,-537.336,-15.916,-212.358,141,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17006625,0,'Batteilant_Bhoot','Batteilant Bhoot',6,75,77,-376.720,-16.225,-338.743,97,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17006626,0,'Batteilant_Bhoot','Batteilant Bhoot',6,75,77,-388.673,-16.288,-341.172,238,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17006627,0,'Darkling_Draugar','Darkling Draugar',7,75,76,-425.841,-16.123,-406.870,134,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17006628,0,'Draconic_Draugar','Draconic Draugar',8,75,76,-424.116,-16.120,-410.327,22,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17006629,0,'Draugars_Wyvern','Draugar\'s Wyvern',9,70,71,-424.116,-16.120,-410.327,22,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17006630,0,'Darkling_Draugar','Darkling Draugar',7,75,76,-381.819,-15.802,-373.410,128,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17006631,0,'Draconic_Draugar','Draconic Draugar',8,75,76,-381.304,-15.840,-374.144,131,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17006632,0,'Draugars_Wyvern','Draugar\'s Wyvern',9,70,71,-381.304,-15.840,-374.144,131,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17006633,0,'Darkling_Draugar','Darkling Draugar',7,75,76,-340.229,-15.681,-337.999,62,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17006634,0,'Darkling_Draugar','Darkling Draugar',7,75,76,-344.746,-15.934,-336.741,33,NULL,NULL);
 
 -- Saving Private Ryaff entrance @ 20 -15.643 548 rot 64
 INSERT INTO `mob_spawn_points` VALUES (17006635,0,'Cursed_Chigoe','Cursed Chigoe',10,77,78,-58.320,-15.850,571.903,196,NULL,NULL);
@@ -920,8 +920,8 @@ INSERT INTO `mob_spawn_points` VALUES (17059850,0,'Leujaoam_Worm','Leujaoam Worm
 INSERT INTO `mob_spawn_points` VALUES (17059851,0,'Leujaoam_Worm','Leujaoam Worm',1,76,78,479.888,7.716,-39.545,57,NULL,NULL);
 INSERT INTO `mob_spawn_points` VALUES (17059852,0,'Leujaoam_Worm','Leujaoam Worm',1,76,78,477.563,7.846,-73.208,170,NULL,NULL);
 INSERT INTO `mob_spawn_points` VALUES (17059853,0,'Leujaoam_Worm','Leujaoam Worm',1,76,78,478.236,7.749,-80.324,76,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17059854,0,'Leujaoam_Worm','Leujaoam Worm',1,76,78,498.838,7.653,-87.358,111,NULL,NULL);
-INSERT INTO `mob_spawn_points` VALUES (17059855,0,'Leujaoam_Worm','Leujaoam Worm',1,76,78,471.118,7.849,-54.299,239,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17059854,0,'Leujaoam_Worm','Leujaoam Worm',1,76,78,496.618,8.201,-70.702,144,NULL,NULL);
+INSERT INTO `mob_spawn_points` VALUES (17059855,0,'Leujaoam_Worm','Leujaoam Worm',1,76,78,483.888,8.027,-54.894,92,NULL,NULL);
 
 -- Orichalcum survey assaut entrance @ -432 -27.627 169
 -- all worms spawn @ mining points in npc_list

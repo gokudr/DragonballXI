@@ -76,9 +76,9 @@ m:addOverrideByEra('xi.job_utils.dragoon.useDamageBreath', {
 })
 
 m:addOverrideByEra('xi.job_utils.dragoon.useSpiritLink', {
-    -- Spirit Link: Revert to pre-September 2015 healing formula.
+    -- Spirit Link: Revert to pre-September 2015 HP cost and heal formula.
     -- Source: https://forum.square-enix.com/ffxi/threads/48564-Sep-16-2015-%28JST%29-Version-Update
-    -- Formula taken from: https://wiki.ffo.jp/html/15079.html
+    -- Formula taken from: https://wiki.ffo.jp/html/1897.html
     [xi.expansion.ROV] = function(player, target, ability, action)
         local wyvern      = player:getPet()
         local playerHP    = player:getHP()
@@ -104,15 +104,13 @@ m:addOverrideByEra('xi.job_utils.dragoon.useSpiritLink', {
 
         -- Handle Stoneskin.
         local stoneskinPower = 0
-
-        if player:hasStatusEffect(xi.effect.STONESKIN) then
-            stoneskinPower = player:getMod(xi.mod.STONESKIN)
+        local stoneskin      = player:getStatusEffect(xi.effect.STONESKIN)
+        if stoneskin then
+            stoneskinPower = stoneskin:getPower()
 
             -- If stoneskin is more powerfull than the amount to be drained.
             if stoneskinPower > drainamount then
-                local effect = player:getStatusEffect(xi.effect.STONESKIN)
-                effect:setPower(effect:getPower() - drainamount) -- Fixes the status effect so when it ends it uses the new power instead of old.
-                player:delMod(xi.mod.STONESKIN, drainamount)     -- Removes the amount from the mod.
+                stoneskin:setPower(stoneskinPower - drainamount) -- Fixes the status effect so when it ends it uses the new power instead of old.
 
             -- If stoneskin is as powerful or less than the amount to be drained.
             else
@@ -121,14 +119,14 @@ m:addOverrideByEra('xi.job_utils.dragoon.useSpiritLink', {
         end
 
         -- Handle master damage and pet healing.
-        player:takeDamage(drainamount - stoneskinPower)
+        player:takeDamage(math.max(0, drainamount - stoneskinPower))
 
         local playerMND = player:getStat(xi.mod.MND)
-        local alpha     = wyvern:getMainLvl() * 0.7
+        local alpha     = math.floor(wyvern:getMainLvl() * 0.7)
         local healPet   = (drainamount + playerMND + alpha) * 2
 
-        if player:getEquipID(xi.slot.HEAD) == xi.item.DRACHEN_ARMET_P1 then
-            healPet = healPet + 15
+        if xi.equipment.getUsableEquipID(player, xi.slot.HEAD) == xi.item.DRACHEN_ARMET_P1 then
+            healPet = healPet + 10
         end
 
         -- Spirit Link is self target but reports effect on Wyvern.
@@ -137,8 +135,9 @@ m:addOverrideByEra('xi.job_utils.dragoon.useSpiritLink', {
         return wyvern:addHP(healPet) -- add the hp to wyvern
     end,
 
-    -- Spirit Link: Revert TP transfer from wyvern to master and removes regen
+    -- Spirit Link: Revert TP transfer from wyvern to master, regen, and doubled heal
     -- TP Transfer Source: https://www.bg-wiki.com/ffxi/Version_Update_(06/21/2010)
+    -- Heal Doubling Source: https://forum.square-enix.com/ffxi/threads/20744
     -- Regen Source: https://www.bg-wiki.com/ffxi/Version_Update_(03/26/2012)
     [xi.expansion.ABYSSEA] = function(player, target, ability, action)
         local wyvern      = player:getPet()
@@ -161,15 +160,13 @@ m:addOverrideByEra('xi.job_utils.dragoon.useSpiritLink', {
 
         -- Handle Stoneskin.
         local stoneskinPower = 0
-
-        if player:hasStatusEffect(xi.effect.STONESKIN) then
-            stoneskinPower = player:getMod(xi.mod.STONESKIN)
+        local stoneskin      = player:getStatusEffect(xi.effect.STONESKIN)
+        if stoneskin then
+            stoneskinPower = stoneskin:getPower()
 
             -- If stoneskin is more powerfull than the amount to be drained.
             if stoneskinPower > drainAmount then
-                local effect = player:getStatusEffect(xi.effect.STONESKIN)
-                effect:setPower(effect:getPower() - drainAmount) -- Fixes the status effect so when it ends it uses the new power instead of old.
-                player:delMod(xi.mod.STONESKIN, drainAmount)     -- Removes the amount from the mod.
+                stoneskin:setPower(stoneskinPower - drainAmount) -- Fixes the status effect so when it ends it uses the new power instead of old.
 
             -- If stoneskin is as powerful or less than the amount to be drained.
             else
@@ -178,16 +175,16 @@ m:addOverrideByEra('xi.job_utils.dragoon.useSpiritLink', {
         end
 
         -- Handle master damage and pet healing.
-        player:takeDamage(drainAmount - stoneskinPower)
+        player:takeDamage(math.max(0, drainAmount - stoneskinPower))
 
-        -- Pre-September 2015: Healing formula includes MND and wyvern level components.
-        -- Source: https://wiki.ffo.jp/html/1897.html https://www.bg-wiki.com/ffxi/Spirit_Link
+        -- Pre-February 2012: Heal is not doubled.
+        -- Source: https://wiki.ffo.jp/html/1897.html
         local playerMND = player:getStat(xi.mod.MND)
-        local alpha     = wyvern:getMainLvl() * 0.7
-        local healPet   = (drainAmount + playerMND + alpha) * 2
+        local alpha     = math.floor(wyvern:getMainLvl() * 0.7)
+        local healPet   = drainAmount + playerMND + alpha
 
-        if player:getEquipID(xi.slot.HEAD) == xi.item.DRACHEN_ARMET_P1 then
-            healPet = healPet + 15
+        if xi.equipment.getUsableEquipID(player, xi.slot.HEAD) == xi.item.DRACHEN_ARMET_P1 then
+            healPet = healPet + 10
         end
 
         -- Spirit Link is self target but reports effect on Wyvern.

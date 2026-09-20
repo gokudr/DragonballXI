@@ -61,7 +61,6 @@
 #include "status_effect_container.h"
 #include "timetriggers.h"
 #include "trade_container.h"
-#include "transport.h"
 #include "weapon_skill.h"
 #include "zone.h"
 
@@ -2535,58 +2534,6 @@ void CLuaBaseEntity::closeDoor(const sol::object& seconds)
 }
 
 /************************************************************************
- *  Function: setElevator()
- *  Purpose : Initializes an elevator or something that moves regularly
- *  Example : See Comments Below
- *  Notes   : See: scripts/zones/Metalworks/npcs/_6lt.lua
- ************************************************************************/
-
-void CLuaBaseEntity::setElevator(uint8 id, uint32 lowerDoor, uint32 upperDoor, uint32 elevatorId, bool reversed)
-{
-    // Usage: setElevator(id, lower door id, upper door id, elevator platform id, animations reversed bool)
-    // If giving the elevator xi::Animation::ElevatorUp makes it go down, set this bool to true
-    if (m_PBaseEntity->objtype != TYPE_NPC)
-    {
-        ShowWarning("Attempting to set elevator with invalid entity type (%s).", m_PBaseEntity->getName());
-        return;
-    }
-
-    Elevator_t elevator = {};
-
-    elevator.id                 = id;
-    elevator.LowerDoor          = static_cast<CNpcEntity*>(zoneutils::GetEntity(lowerDoor, TYPE_NPC));
-    elevator.UpperDoor          = static_cast<CNpcEntity*>(zoneutils::GetEntity(upperDoor, TYPE_NPC));
-    elevator.Elevator           = static_cast<CNpcEntity*>(zoneutils::GetEntity(elevatorId, TYPE_NPC));
-    elevator.animationsReversed = reversed;
-    elevator.state              = STATE_ELEVATOR_BOTTOM;
-    elevator.lastTrigger        = vanadiel_time::time_point::min();
-
-    if (!elevator.Elevator || !elevator.LowerDoor || !elevator.UpperDoor)
-    {
-        ShowWarning("Elevator id %d initialization failed - an ID resolved to no entity.", elevatorId);
-        return;
-    }
-
-    // ID of 0 means it is a timed, automatic elevator
-    elevator.activated   = elevator.id == 0;
-    elevator.isPermanent = elevator.id == 0;
-
-    elevator.movetime = xi::vanadiel_clock::minutes(3);
-    elevator.interval = xi::vanadiel_clock::minutes(8);
-
-    if (m_PBaseEntity->loc.zone)
-    {
-        elevator.zoneID = m_PBaseEntity->loc.zone->GetID();
-    }
-    else
-    {
-        ShowError("setElevator failed! Entity does not have loc.zone assigned!");
-    }
-
-    CTransportHandler::getInstance()->insertElevator(elevator);
-}
-
-/************************************************************************
  *  Function: addPeriodicTrigger()
  *  Purpose : registers a periodic trigger for an NPC
  *  Example : BastokDrawbridge:addPeriodicTrigger(0, 360, 80)
@@ -2703,7 +2650,7 @@ void CLuaBaseEntity::hideNPC(const sol::object& seconds)
 /************************************************************************
  *  Function: updateNPCHideTime()
  *  Purpose : Adds more time to an NPC being hidden
- *  Example : npc:updateNPCHideTime(50000) -- Hide-and-Seek World Champ
+ *  Example : npc:updateNPCHideTime(50) -- Hide for another 50 seconds
  *  Notes   : Default is 15 seconds
  ************************************************************************/
 
@@ -4669,13 +4616,15 @@ bool CLuaBaseEntity::delItem(uint16 itemID, int32 quantity, const sol::object& c
 
     uint8 location = containerID.get_type() == sol::type::number ? containerID.as<uint8>() : 0;
 
-    if (location >= CONTAINER_ID::MAX_CONTAINER_ID)
+    auto* PChar    = static_cast<CCharEntity*>(m_PBaseEntity);
+    auto* PStorage = PChar->getStorage(location);
+    if (!PStorage)
     {
-        ShowWarning("Lua::delItem: Attempting to delete an item from an invalid slot. Defaulting to main inventory.");
+        ShowWarning("Attempting to delete an item from an invalid container.");
+        return false;
     }
 
-    auto* PChar  = static_cast<CCharEntity*>(m_PBaseEntity);
-    auto  SlotID = PChar->getStorage(location)->SearchItem(itemID);
+    auto SlotID = PStorage->SearchItem(itemID);
 
     if (SlotID != ERROR_SLOTID)
     {
@@ -4757,7 +4706,14 @@ bool CLuaBaseEntity::delContainerItems(const sol::object& containerID)
 
     auto* PChar          = static_cast<CCharEntity*>(m_PBaseEntity);
     auto* PItemContainer = PChar->getStorage(location);
-    uint8 containerSize  = PItemContainer->GetSize();
+
+    if (!PItemContainer)
+    {
+        ShowWarning("Attempting to delete items from an invalid container.");
+        return false;
+    }
+
+    uint8 containerSize = PItemContainer->GetSize();
 
     // ensure we unequip equipped items before deletion
     for (uint8 equipmentSlot = 0; equipmentSlot <= 15; equipmentSlot++)
@@ -5297,7 +5253,9 @@ uint8 CLuaBaseEntity::getContainerSize(uint8 locationID)
     }
 
     auto* PChar = static_cast<CCharEntity*>(m_PBaseEntity);
-    return PChar->getStorage(locationID)->GetSize();
+
+    const auto* PStorage = PChar->getStorage(locationID);
+    return PStorage ? PStorage->GetSize() : 0;
 }
 
 /************************************************************************
@@ -5345,7 +5303,9 @@ uint8 CLuaBaseEntity::getFreeSlotsCount(const sol::object& locID)
     }
 
     uint8 locationID = (locID != sol::lua_nil) ? locID.as<CONTAINER_ID>() : LOC_INVENTORY;
-    return static_cast<CCharEntity*>(m_PBaseEntity)->getStorage(locationID)->GetFreeSlotsCount();
+
+    const auto* PStorage = static_cast<CCharEntity*>(m_PBaseEntity)->getStorage(locationID);
+    return PStorage ? PStorage->GetFreeSlotsCount() : 0;
 }
 
 /************************************************************************
@@ -5749,7 +5709,10 @@ auto CLuaBaseEntity::getStorageItem(uint8 container, uint8 slotID, uint8 equipID
 
     if (equipID == 255)
     {
-        PItem = PChar->getStorage(container)->GetItem(slotID);
+        if (auto* PStorage = PChar->getStorage(container))
+        {
+            PItem = PStorage->GetItem(slotID);
+        }
     }
     else
     {
@@ -9328,11 +9291,11 @@ void CLuaBaseEntity::completeAssault(const uint8 missionID) const
 /************************************************************************
  *  Function: addKeyItem()
  *  Purpose : Adds a key item to the player
- *  Example : player:addKeyItem(xi.ki.MOGHANCEMENT_FIRE)
+ *  Example : player:addKeyItem(xi.keyItem.MOGHANCEMENT_FIRE)
  *  Notes   :
  ************************************************************************/
 
-void CLuaBaseEntity::addKeyItem(const KeyItem keyItemID) const
+void CLuaBaseEntity::addKeyItem(const xi::KeyItem keyItemID) const
 {
     if (m_PBaseEntity->objtype != TYPE_PC)
     {
@@ -9363,11 +9326,11 @@ void CLuaBaseEntity::addKeyItem(const KeyItem keyItemID) const
 /************************************************************************
  *  Function: hasKeyItem()
  *  Purpose : Returns true if a player has a specified key item
- *  Example : if (player:hasKeyItem(xi.ki.TORN_PAPER)) then
+ *  Example : if (player:hasKeyItem(xi.keyItem.TORN_PAPER)) then
  *  Notes   :
  ************************************************************************/
 
-auto CLuaBaseEntity::hasKeyItem(const KeyItem keyItemID) const -> bool
+auto CLuaBaseEntity::hasKeyItem(const xi::KeyItem keyItemID) const -> bool
 {
     if (m_PBaseEntity->objtype != TYPE_PC)
     {
@@ -9381,11 +9344,11 @@ auto CLuaBaseEntity::hasKeyItem(const KeyItem keyItemID) const -> bool
 /************************************************************************
  *  Function: delKeyItem()
  *  Purpose : Deletes a key item from the player
- *  Example : player:delKeyItem(xi.ki.SUNBEAM_FRAGMENT)
+ *  Example : player:delKeyItem(xi.keyItem.SUNBEAM_FRAGMENT)
  *  Notes   :
  ************************************************************************/
 
-void CLuaBaseEntity::delKeyItem(const KeyItem keyItemID) const
+void CLuaBaseEntity::delKeyItem(const xi::KeyItem keyItemID) const
 {
     if (m_PBaseEntity->objtype != TYPE_PC)
     {
@@ -9411,11 +9374,11 @@ void CLuaBaseEntity::delKeyItem(const KeyItem keyItemID) const
 /************************************************************************
  *  Function: seenKeyItem()
  *  Purpose : Returns true if a player has peeked at the key item
- *  Example : if player:seenKeyItem(xi.ki.LETTER_FROM_ROH_LATTEH) then
+ *  Example : if player:seenKeyItem(xi.keyItem.LETTER_FROM_ROH_LATTEH) then
  *  Notes   :
  ************************************************************************/
 
-bool CLuaBaseEntity::seenKeyItem(const KeyItem keyItemID) const
+bool CLuaBaseEntity::seenKeyItem(const xi::KeyItem keyItemID) const
 {
     if (m_PBaseEntity->objtype != TYPE_PC)
     {
@@ -9429,11 +9392,11 @@ bool CLuaBaseEntity::seenKeyItem(const KeyItem keyItemID) const
 /************************************************************************
  *  Function: unseenKeyItem()
  *  Purpose : Restores a key item to unseen status
- *  Example : player:unseenKeyItem(xi.ki.MOGHANCEMENT_FIRE)
+ *  Example : player:unseenKeyItem(xi.keyItem.MOGHANCEMENT_FIRE)
  *  Notes   : Some things just can't be unseen... (not implemented though)
  ************************************************************************/
 
-void CLuaBaseEntity::unseenKeyItem(const KeyItem keyItemID) const
+void CLuaBaseEntity::unseenKeyItem(const xi::KeyItem keyItemID) const
 {
     if (m_PBaseEntity->objtype != TYPE_PC)
     {
@@ -9459,11 +9422,12 @@ void CLuaBaseEntity::unseenKeyItem(const KeyItem keyItemID) const
 /************************************************************************
  *  Function: addExp()
  *  Purpose : Adds a set amount of XP to the player
- *  Example : player:addExp(math.randomInt(500, 1000))
- *  Notes   : Used in Dynamis Pages, etc
+ *  Example : player:addExp(math.randomInt(500, 1000), false)
+ *  Notes   : allowLimitPoints defaults to true. Set false for EXP only.
+ *            The script must send the gain message when false.
  ************************************************************************/
 
-void CLuaBaseEntity::addExp(uint32 exp)
+void CLuaBaseEntity::addExp(uint32 exp, const sol::object& allowLimitPointsObj)
 {
     if (m_PBaseEntity->objtype != TYPE_PC)
     {
@@ -9471,9 +9435,10 @@ void CLuaBaseEntity::addExp(uint32 exp)
         return;
     }
 
-    auto* PChar = static_cast<CCharEntity*>(m_PBaseEntity);
+    auto*      PChar            = static_cast<CCharEntity*>(m_PBaseEntity);
+    const bool allowLimitPoints = allowLimitPointsObj.is<bool>() ? allowLimitPointsObj.as<bool>() : true;
 
-    charutils::AddExperiencePoints(false, false, true, PChar, m_PBaseEntity, exp);
+    charutils::AddExperiencePoints(false, false, true, PChar, m_PBaseEntity, exp, EMobDifficulty::TooWeak, false, allowLimitPoints);
 }
 
 /************************************************************************
@@ -10074,6 +10039,24 @@ void CLuaBaseEntity::gainConquestInfluence(int32 points)
 }
 
 /************************************************************************
+ *  Function: addConquestMobKills()
+ *  Purpose : Adds mob kills to the player's current region
+ *  Example : player:addConquestMobKills(25)
+ *  Notes   :
+ ************************************************************************/
+
+void CLuaBaseEntity::addConquestMobKills(int32 count)
+{
+    if (m_PBaseEntity->objtype != TYPE_PC)
+    {
+        ShowWarning("Invalid entity type calling function (%s).", m_PBaseEntity->getName());
+        return;
+    }
+
+    conquest::AddMobKills(count, zoneutils::GetCurrentRegion(m_PBaseEntity->getZone()));
+}
+
+/************************************************************************
  *  Function: getSeals()
  *  Purpose : Returns the current seal balance for a player
  *  Example : player:getSeals(type)
@@ -10487,6 +10470,36 @@ void CLuaBaseEntity::setHP(int32 value)
     {
         PBattle->lastAttackerId_.clean();
     }
+}
+
+/************************************************************************
+ *  Function: die()
+ *  Purpose : Kills a player, describing the circumstances of the death
+ *  Example : player:die({ expLoss = false, mijin = true })
+ *  Notes   : Only the given keys are changed. Death will occur on the next tick.
+ ************************************************************************/
+
+void CLuaBaseEntity::die(const sol::object& params)
+{
+    auto* PChar = dynamic_cast<CCharEntity*>(m_PBaseEntity);
+    if (!PChar)
+    {
+        ShowWarning("Invalid Entity (%s) calling function.", m_PBaseEntity->getName());
+        return;
+    }
+
+    if (params.is<sol::table>())
+    {
+        const auto table  = params.as<sol::table>();
+        auto       staged = PChar->nextDeath().value_or(DeathParams{});
+
+        staged.losesExp = table.get_or("expLoss", staged.losesExp);
+        staged.mijin    = table.get_or("mijin", staged.mijin);
+
+        PChar->setNextDeath(staged);
+    }
+
+    setHP(0);
 }
 
 /************************************************************************
@@ -12451,6 +12464,23 @@ auto CLuaBaseEntity::getBattlefield() const -> CBattlefield*
 }
 
 /************************************************************************
+ *  Function: getRegisteredBattlefield()
+ *  Purpose : Returns the battlefield the player is registered for, whether or not they still hold clearance
+ *  Example : local battlefield = player:getRegisteredBattlefield()
+ *  Notes   : Tells a member whose fight locked apart from someone who never had clearance
+ ************************************************************************/
+
+auto CLuaBaseEntity::getRegisteredBattlefield() const -> CBattlefield*
+{
+    if (m_PBaseEntity->objtype != TYPE_PC || m_PBaseEntity->loc.zone == nullptr || m_PBaseEntity->loc.zone->battlefieldHandler() == nullptr)
+    {
+        return nullptr;
+    }
+
+    return m_PBaseEntity->loc.zone->battlefieldHandler()->GetRegisteredBattlefield(static_cast<CCharEntity*>(m_PBaseEntity));
+}
+
+/************************************************************************
  *  Function: getBattlefieldID()
  *  Purpose : Returns the integer ID for the battlefield, -1 if not found
  *  Example : local battlefieldId = player:getBattlefieldID()
@@ -14196,11 +14226,11 @@ auto CLuaBaseEntity::addStatusEffect(const xi::StatusEffect effectId, sol::table
 
     // Optional parameters
     const auto duration        = params["duration"].get_or(0.0);
-    const auto power           = static_cast<uint16>(params["power"].get_or(0.0));
-    const auto tick            = static_cast<uint32>(params["tick"].get_or(0.0));
+    const auto power           = static_cast<uint16>(static_cast<int64>(params["power"].get_or(0.0)));
+    const auto tick            = static_cast<uint32>(static_cast<int64>(params["tick"].get_or(0.0)));
     const auto icon            = params["icon"].get_or(static_cast<uint16>(effectId));
     const auto subType         = params["subType"].get_or(0u);
-    const auto subPower        = static_cast<uint16>(params["subPower"].get_or(0.0));
+    const auto subPower        = static_cast<uint16>(static_cast<int64>(params["subPower"].get_or(0.0)));
     const auto subIcon         = params["subIcon"].get_or(0u);
     const auto tier            = params["tier"].get_or<uint16>(0);
     const auto flag            = params["flag"].get_or(0u);
@@ -16183,6 +16213,28 @@ void CLuaBaseEntity::spawnPet(const sol::object& arg0)
         // setup AI
         PPet->Spawn();
     }
+}
+
+/************************************************************************
+ *  Function: setPetStats()
+ *  Purpose : Applies the chosen spirit's model, jobs, spells and stats without changing the pet's name
+ *  Example : mob:setPetStats(xi.petId.ICE_SPIRIT)
+ *  Notes   : Called from the pet's onMobSpawn
+ ************************************************************************/
+
+void CLuaBaseEntity::setPetStats(uint8 petId)
+{
+    auto* PMob = dynamic_cast<CMobEntity*>(m_PBaseEntity);
+    if (!PMob || !PMob->PMaster || PMob->PMaster->PPet != PMob || petId > PETID_DARKSPIRIT)
+    {
+        ShowError("setPetStats: expected a linked mob pet and a spirit ID.");
+        return;
+    }
+
+    petutils::SpawnMobPet(PMob->PMaster, petId, true);
+    PMob->TraitList.clear();
+    mobutils::CalculateMobStats(PMob);
+    mobutils::GetAvailableSpells(PMob);
 }
 
 /************************************************************************
@@ -18560,7 +18612,14 @@ auto CLuaBaseEntity::getSpellListId() const -> uint16
     {
         if (PMob->m_SpellListContainer)
         {
-            return PMob->m_SpellListContainer->getId();
+            const auto listId = PMob->m_SpellListContainer->getId();
+            if (!listId)
+            {
+                ShowErrorFmt("CLuaBaseEntity::getSpellListId: {} names its own spells and has no list id", PMob->getName());
+                return 0;
+            }
+
+            return *listId;
         }
     }
 
@@ -20585,7 +20644,6 @@ void CLuaBaseEntity::Register()
 
     SOL_REGISTER("openDoor", CLuaBaseEntity::openDoor);
     SOL_REGISTER("closeDoor", CLuaBaseEntity::closeDoor);
-    SOL_REGISTER("setElevator", CLuaBaseEntity::setElevator);
 
     SOL_REGISTER("addPeriodicTrigger", CLuaBaseEntity::addPeriodicTrigger);
     SOL_REGISTER("showNPC", CLuaBaseEntity::showNPC);
@@ -20889,6 +20947,7 @@ void CLuaBaseEntity::Register()
     SOL_REGISTER("addCP", CLuaBaseEntity::addCP);
     SOL_REGISTER("delCP", CLuaBaseEntity::delCP);
     SOL_REGISTER("gainConquestInfluence", CLuaBaseEntity::gainConquestInfluence);
+    SOL_REGISTER("addConquestMobKills", CLuaBaseEntity::addConquestMobKills);
 
     SOL_REGISTER("getSeals", CLuaBaseEntity::getSeals);
     SOL_REGISTER("addSeals", CLuaBaseEntity::addSeals);
@@ -20914,6 +20973,7 @@ void CLuaBaseEntity::Register()
     SOL_REGISTER("addHPLeaveSleeping", CLuaBaseEntity::addHPLeaveSleeping);
 
     SOL_REGISTER("setHP", CLuaBaseEntity::setHP);
+    SOL_REGISTER("die", CLuaBaseEntity::die);
     SOL_REGISTER("setMaxHP", CLuaBaseEntity::setMaxHP);
     SOL_REGISTER("restoreHP", CLuaBaseEntity::restoreHP);
     SOL_REGISTER("delHP", CLuaBaseEntity::delHP);
@@ -21010,6 +21070,7 @@ void CLuaBaseEntity::Register()
 
     // Battlefields
     SOL_REGISTER("getBattlefield", CLuaBaseEntity::getBattlefield);
+    SOL_REGISTER("getRegisteredBattlefield", CLuaBaseEntity::getRegisteredBattlefield);
     SOL_REGISTER("getBattlefieldID", CLuaBaseEntity::getBattlefieldID);
     SOL_REGISTER("registerBattlefield", CLuaBaseEntity::registerBattlefield);
     SOL_REGISTER("battlefieldAtCapacity", CLuaBaseEntity::battlefieldAtCapacity);
@@ -21196,6 +21257,7 @@ void CLuaBaseEntity::Register()
     SOL_REGISTER("isJugPet", CLuaBaseEntity::isJugPet);
     SOL_REGISTER("getPetElement", CLuaBaseEntity::getPetElement);
     SOL_REGISTER("setPet", CLuaBaseEntity::setPet);
+    SOL_REGISTER("setPetStats", CLuaBaseEntity::setPetStats);
     SOL_REGISTER("getMinimumPetLevel", CLuaBaseEntity::getMinimumPetLevel);
     SOL_REGISTER("getMaster", CLuaBaseEntity::getMaster);
 

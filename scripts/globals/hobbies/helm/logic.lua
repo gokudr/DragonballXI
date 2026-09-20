@@ -44,6 +44,65 @@ local breakMods =
     [xi.helmType.EXCAVATION] = nil,
 }
 
+local function getDropWeight(player, zoneId, zoneInfo, drop)
+    local itemId = drop[2]
+    local weight = drop[1]
+
+    -- Daily caps reduce one item's weight per obtain and reset on zone-in after JST midnight.
+    local limit = zoneInfo.dailyCap and zoneInfo.dailyCap[itemId]
+    if limit then
+        local obtained = player:getCharVar(string.format('[HELM]DailyCap[%u][%u]', zoneId, itemId))
+        if obtained >= limit then
+            return 0
+        end
+
+        weight = math.floor(weight / (obtained + 1))
+    end
+
+    -- Depletion reduces every pool member's weight using a shared count that resets on zoning.
+    local depletion = zoneInfo.depletion
+    if depletion and utils.contains(itemId, depletion.pool) then
+        local obtained = player:getCharVar(string.format('[HELM][Depletion][%u]', zoneId))
+        if obtained >= depletion.max then
+            return 0
+        end
+
+        weight = math.floor(weight * (depletion.max - obtained) / depletion.max)
+    end
+
+    return weight
+end
+
+local function incrementDailyCap(player, zoneId, zoneInfo, itemId)
+    local dailyCap = zoneInfo.dailyCap
+    local limit    = dailyCap and dailyCap[itemId]
+    if not limit then
+        return
+    end
+
+    local capVar   = string.format('[HELM]DailyCap[%u][%u]', zoneId, itemId)
+    local resetVar = string.format('[HELM]DailyCap[%u][ResetTime]', zoneId)
+    local obtained = math.min(player:getCharVar(capVar) + 1, limit)
+
+    if player:getCharVar(resetVar) == 0 then
+        player:setCharVar(resetVar, JstMidnight())
+    end
+
+    player:setCharVar(capVar, obtained)
+end
+
+local function incrementDepletion(player, zoneId, zoneInfo, itemId)
+    local depletion = zoneInfo.depletion
+    if not depletion or not utils.contains(itemId, depletion.pool) then
+        return
+    end
+
+    local depletionVar = string.format('[HELM][Depletion][%u]', zoneId)
+    local obtained     = math.min(player:getCharVar(depletionVar) + 1, depletion.max)
+
+    player:setCharVar(depletionVar, obtained)
+end
+
 local function hasCampPenalty(player, npc, helmType)
     local positionIndex = npc:getLocalVar('[HELM]PositionIndex')
     if positionIndex == 0 then
@@ -97,7 +156,8 @@ end
 
 local function pickItem(player, info)
     local zoneId   = player:getZoneID()
-    local minLevel = info.zone[zoneId].minLevel or 0
+    local zoneInfo = info.zone[zoneId]
+    local minLevel = zoneInfo.minLevel or 0
 
     -- some zones award nothing below a level requirement, the tool still breaks
     if player:getMainLvl() < minLevel then
@@ -105,17 +165,19 @@ local function pickItem(player, info)
     end
 
     -- found nothing
-    if math.randomFloat(0, 100) >= info.zone[zoneId].obtainRate then
+    if math.randomFloat(0, 100) >= zoneInfo.obtainRate then
         return 0
     end
 
     -- possible drops
-    local drops = info.zone[zoneId].drops
+    local drops   = zoneInfo.drops
+    local weights = {}
 
     -- sum weights
     local sum = 0
     for i = 1, #drops do
-        sum = sum + drops[i][1]
+        weights[i] = getDropWeight(player, zoneId, zoneInfo, drops[i])
+        sum = sum + weights[i]
     end
 
     -- pick weighted result
@@ -124,7 +186,7 @@ local function pickItem(player, info)
     sum = 0
 
     for i = 1, #drops do
-        sum = sum + drops[i][1]
+        sum = sum + weights[i]
         if sum >= pick then
             item = drops[i][2]
             break
@@ -151,7 +213,7 @@ local function movePoint(player, npc, zoneId, info, helmType)
     local positionIndex = math.randomInt(1, #points)
     local point         = points[positionIndex]
 
-    npc:hideNPC(120)
+    npc:hideNPC(info.respawnTime)
     npc:queue(3000, function(entity)
         entity:setPos(point[1], point[2], point[3], 0)
         entity:setLocalVar('[HELM]PositionIndex', positionIndex)
@@ -176,6 +238,18 @@ xi.helm.initZone = function(zone, helmType)
     end
 end
 
+xi.helm.onZoneIn = function(player)
+    local zoneId    = player:getZoneID()
+    local capPrefix = string.format('[HELM]DailyCap[%u]', zoneId)
+    local resetTime = player:getCharVar(capPrefix .. '[ResetTime]')
+    if resetTime == 0 or GetSystemTime() < resetTime then
+        return
+    end
+
+    -- The new daily pool is applied on zone-in, not while the player remains in the zone.
+    player:clearVarsWithPrefix(capPrefix)
+end
+
 xi.helm.onZoneOut = function(player)
     if player:getStatus() == xi.status.SHUTDOWN then
         return
@@ -191,11 +265,11 @@ xi.helm.result = function(player, helmType, broke, itemID)
     if
         helmType == xi.helmType.HARVESTING and
         player:getQuestStatus(xi.questLog.AHT_URHGAN, xi.quest.id.ahtUrhgan.VANISHING_ACT) == xi.questStatus.QUEST_ACCEPTED and
-        not player:hasKeyItem(xi.ki.RAINBOW_BERRY) and
+        not player:hasKeyItem(xi.keyItem.RAINBOW_BERRY) and
         broke ~= 1 and
         zoneId == xi.zone.WAJAOM_WOODLANDS
     then
-        npcUtil.giveKeyItem(player, xi.ki.RAINBOW_BERRY)
+        npcUtil.giveKeyItem(player, xi.keyItem.RAINBOW_BERRY)
     end
 
     -- AMK mission 4 (index 3)
@@ -260,7 +334,10 @@ xi.helm.onTrade = function(player, npc, trade, helmType, csid, func)
 
         -- success! reward item and roll to relocate the point
         if itemID ~= 0 then
-            player:addItem(itemID)
+            if player:addItem(itemID) then
+                incrementDailyCap(player, zoneId, info.zone[zoneId], itemID)
+                incrementDepletion(player, zoneId, info.zone[zoneId], itemID)
+            end
 
             if math.randomInt(1, 100) <= info.relocateRate then
                 movePoint(player, npc, zoneId, info, helmType)

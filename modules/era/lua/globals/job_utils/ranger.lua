@@ -5,55 +5,65 @@ require('modules/module_utils')
 -----------------------------------
 local m = Module:new('era_job_utils_ranger')
 
--- Eagle Eye Shot: Revert shadow bypass
--- Source: https://forum.square-enix.com/ffxi/threads/47481-Jun-25-2015-%28JST%29-Version-Update
+local function useEagleEyeShot(player, target, action, enmityMult)
+    if player:getWeaponSkillType(xi.slot.RANGED) == xi.skill.MARKSMANSHIP then
+        action:setAnimation(target:getID(), action:getAnimation(target:getID()) + 1)
+    end
+
+    local params = {}
+
+    params.numHits = 1
+
+    -- TP params.
+    local tp          = 1000 -- to ensure ftp multiplier is applied
+    params.ftpMod     = { 5.0, 5.0, 5.0 }
+    params.critVaries = { 0.0, 0.0, 0.0 }
+
+    -- Stat params.
+    params.str_wsc = 0
+    params.dex_wsc = 0
+    params.vit_wsc = 0
+    params.agi_wsc = 0
+    params.int_wsc = 0
+    params.mnd_wsc = 0
+    params.chr_wsc = 0
+
+    params.enmityMult = enmityMult
+
+    -- Job Point Bonus Damage
+    local jpValue = player:getJobPointLevel(xi.jp.EAGLE_EYE_SHOT_EFFECT)
+    player:addMod(xi.mod.ALL_WSDMG_ALL_HITS, jpValue * 3)
+
+    local damage, _, tpHits, extraHits = xi.weaponskills.doRangedWeaponskill(player, target, 0, params, tp, action, true)
+
+    -- Set the message id ourselves
+    if tpHits + extraHits > 0 then
+        action:messageID(target:getID(), xi.msg.basic.JA_DAMAGE)
+    else
+        action:messageID(target:getID(), xi.msg.basic.JA_MISS_2)
+    end
+
+    return damage
+end
+
 m:addOverrideByEra('xi.job_utils.ranger.useEagleEyeShot', {
+    -- Revert shadow bypass
+    -- Source: https://forum.square-enix.com/ffxi/threads/47481-Jun-25-2015-%28JST%29-Version-Update
     [xi.expansion.ROV] = function(player, target, ability, action)
-        if player:getWeaponSkillType(xi.slot.RANGED) == xi.skill.MARKSMANSHIP then
-            action:setAnimation(target:getID(), action:getAnimation(target:getID()) + 1)
-        end
+        return useEagleEyeShot(player, target, action, 0.5)
+    end,
 
-        local params = {}
-
-        params.numHits = 1
-
-        -- TP params.
-        local tp          = 1000 -- to ensure ftp multiplier is applied
-        params.ftpMod     = { 5.0, 5.0, 5.0 }
-        params.critVaries = { 0.0, 0.0, 0.0 }
-
-        -- Stat params.
-        params.str_wsc = 0
-        params.dex_wsc = 0
-        params.vit_wsc = 0
-        params.agi_wsc = 0
-        params.int_wsc = 0
-        params.mnd_wsc = 0
-        params.chr_wsc = 0
-
-        params.enmityMult = 0.5
-
-        -- Job Point Bonus Damage
-        local jpValue = player:getJobPointLevel(xi.jp.EAGLE_EYE_SHOT_EFFECT)
-        player:addMod(xi.mod.ALL_WSDMG_ALL_HITS, jpValue * 3)
-
-        local damage, _, tpHits, extraHits = xi.weaponskills.doRangedWeaponskill(player, target, 0, params, tp, action, true)
-
-        -- Set the message id ourselves
-        if tpHits + extraHits > 0 then
-            action:messageID(target:getID(), xi.msg.basic.JA_DAMAGE)
-        else
-            action:messageID(target:getID(), xi.msg.basic.JA_MISS_2)
-        end
-
-        return damage
+    -- Revert enmity reduction
+    -- Source: https://www.bg-wiki.com/ffxi/Version_Update_(05/15/2012)
+    [xi.expansion.ABYSSEA] = function(player, target, ability, action)
+        return useEagleEyeShot(player, target, action, 1)
     end,
 })
 
 local scavengeData = require('modules/era/lua/data/scavenge_data')
 
 -- Scavenge: Revert to pre-SoA zone-based item gathering and reduce duration with merits
--- Source: https://ffxiclopedia.fandom.com/wiki/Scavenge/Items
+-- Sources: https://ffxiclopedia.fandom.com/wiki/Scavenge/Items, https://wiki.ffo.jp/html/2985.html
 m:addOverrideByEra('xi.job_utils.ranger.useScavenge', {
     [xi.expansion.SOA] = function(player, target, ability, action)
         local meritReduction = player:getMerit(xi.merit.SCAVENGE_EFFECT)
@@ -65,10 +75,11 @@ m:addOverrideByEra('xi.job_utils.ranger.useScavenge', {
         end
 
         local playerID = target:getID()
-        local zonePool = scavengeData.zonePoolMap[player:getZoneID()]
+        local zoneID   = player:getZoneID()
+        local zoneData = scavengeData.zonePoolMap[zoneID]
 
         -- Zone has no scavenge pool, return nothing
-        if not zonePool then
+        if not zoneData then
             action:messageID(playerID, xi.msg.basic.SCAVENGE_FIND_NOTHING)
 
             return 0
@@ -100,14 +111,23 @@ m:addOverrideByEra('xi.job_utils.ranger.useScavenge', {
             return 0
         end
 
-        -- Build item pool from zone-specific and guaranteed items
+        -- Build the item pool for scavenge rewards with common items + zone specific items + that zones ammo tier.
         local itemPool = {}
+        local supplies = {}
 
-        for _, v in pairs(zonePool) do
+        for _, v in pairs(zoneData.scavengePool) do
             itemPool[#itemPool + 1] = v
         end
 
-        itemPool[#itemPool + 1] = scavengeData.guaranteedItems[math.randomInt(1, #scavengeData.guaranteedItems)]
+        for _, itemID in ipairs(scavengeData.commonItems) do
+            supplies[#supplies + 1] = itemID
+        end
+
+        for _, itemID in ipairs(zoneData.ammoPool) do
+            supplies[#supplies + 1] = itemID
+        end
+
+        itemPool[#itemPool + 1] = supplies[math.randomInt(1, #supplies)]
 
         local selectedItem = itemPool[math.randomInt(1, #itemPool)]
 

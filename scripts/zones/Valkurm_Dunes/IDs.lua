@@ -31,6 +31,7 @@ zones[xi.zone.VALKURM_DUNES] =
         FIND_NOTHING                   = 7269,  -- You dig and you dig, but find nothing.
         AMK_DIGGING_OFFSET             = 7335,  -- You spot some familiar footprints. You are convinced that your moogle friend has been digging in the immediate vicinity.
         FOUND_ITEM_WITH_EASE           = 7344,  -- It appears your chocobo found this item with ease.
+        BEASTMEN_CACHE_OFFSET          = 7349,  -- You discover a cache of beastman resources and receive <number> conquest point[/s]!
         SONG_RUNES_DEFAULT             = 7355,  -- Lyrics on the old monument sing the story of lovers torn apart.
         UNLOCK_BARD                    = 7376,  -- You can now become a bard!
         JUST_A_PILE_OF_SAND            = 7377,  -- Just a pile of sand.
@@ -69,6 +70,7 @@ zones[xi.zone.VALKURM_DUNES] =
     {
         BEACH_MONK             = GetFirstID('Beach_Monk'),
         DOMAN                  = GetFirstID('Doman'),
+        GOBLIN_BOUNTY_HUNTER   = GetFirstID('Goblin_Bounty_Hunter'),
         GOLDEN_BAT             = GetFirstID('Golden_Bat'),
         HALFORC_BLACK_MAGE     = GetFirstID('Halforc_Black_Mage'),
         HALFORC_DARK_KNIGHT    = GetFirstID('Halforc_Dark_Knight'),

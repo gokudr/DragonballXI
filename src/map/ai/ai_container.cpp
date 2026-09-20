@@ -341,12 +341,12 @@ auto CAIContainer::Internal_RangedAttack(const EntityId& target) -> bool
     return false;
 }
 
-auto CAIContainer::Internal_Die(timer::duration deathTime) -> bool
+auto CAIContainer::Internal_Die(timer::duration deathTime, DeathParams params) -> bool
 {
     auto* entity = dynamic_cast<CBattleEntity*>(PEntity);
     if (entity)
     {
-        return ChangeState<CDeathState>(entity, deathTime);
+        return ChangeState<CDeathState>(entity, deathTime, params);
     }
     return false;
 }
@@ -430,7 +430,7 @@ auto CAIContainer::CanChangeState() const -> bool
 
 auto CAIContainer::CanFollowPath() const -> bool
 {
-    return PathFind && (!GetCurrentState() || GetCurrentState()->CanChangeState());
+    return PathFind && (!GetCurrentState() || (GetCurrentState()->CanChangeState() && GetCurrentState()->CanFollowPath()));
 }
 
 void CAIContainer::SetController(std::unique_ptr<CController> controller)
@@ -477,13 +477,12 @@ void CAIContainer::Reset()
 
 auto CAIContainer::Tick(const timer::time_point tick) -> Task<void>
 {
-    TracyZoneScoped;
+    TracyZoneScopedN("CAIContainer::Tick");
 
     m_PrevTick = m_Tick;
     m_Tick     = tick;
 
-    // TODO: timestamp in the event?
-    EventHandler.triggerListener("TICK", PEntity);
+    EventHandler.triggerListener("TICK", PEntity, std::chrono::duration_cast<std::chrono::milliseconds>(m_Tick - m_PrevTick).count());
 
     co_await PEntity->Tick(tick);
 
