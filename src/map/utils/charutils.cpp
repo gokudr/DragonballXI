@@ -36,6 +36,7 @@
 #include <common/types/hash_map.h>
 
 #include <array>
+#include <bit>
 #include <chrono>
 
 #include "map_constants.h"
@@ -118,6 +119,8 @@
 #include "zoneutils.h"
 
 #include "data/enums/key_item.h"
+#include "enums/mission_log.h"
+#include "enums/msg_basic.h"
 #include "enums/quest_log.h"
 #include "items/item_furnishing.h"
 #include "items/item_linkshell.h"
@@ -1490,7 +1493,7 @@ void SendInventory(CCharEntity* PChar)
         }
     }
 
-    CItem* PItem = PChar->getEquip(SLOT_LINK1);
+    CItem* PItem = PChar->getLinkshell(SLOT_LINK1);
     if (PItem != nullptr)
     {
         auto eloc1 = PChar->equipLocation(SLOT_LINK1);
@@ -1500,7 +1503,7 @@ void SendInventory(CCharEntity* PChar)
         PChar->pushPacket<GP_SERV_COMMAND_GROUP_COMLINK>(PChar, 1);
     }
 
-    PItem = PChar->getEquip(SLOT_LINK2);
+    PItem = PChar->getLinkshell(SLOT_LINK2);
     if (PItem != nullptr)
     {
         auto eloc2 = PChar->equipLocation(SLOT_LINK2);
@@ -3838,15 +3841,11 @@ void TrySkillUP(CCharEntity* PChar, xi::SkillType SkillID, uint8 lvl, bool force
             // convert to 10th units
             CapSkill = CapSkill * 10;
 
-            int16 rovBonus = 1;
-
-            for (const auto skillupIncreaseKeyItem : skillupIncreaseKeyItems)
-            {
-                if (hasKeyItem(PChar, skillupIncreaseKeyItem))
-                {
-                    rovBonus += 1;
-                }
-            }
+            const auto rovBonus = static_cast<int16>(1 + std::ranges::count_if(skillupIncreaseKeyItems,
+                                                                               [&](const auto skillupIncreaseKeyItem)
+                                                                               {
+                                                                                   return hasKeyItem(PChar, skillupIncreaseKeyItem);
+                                                                               }));
 
             SkillAmount *= rovBonus;
             if (SkillAmount > 9)
@@ -5770,11 +5769,8 @@ void SaveChatFilterFlags(CCharEntity* PChar)
 {
     TracyZoneScoped;
 
-    uint32_t filters1 = {};
-    uint32_t filters2 = {};
-
-    std::memcpy(&filters1, &PChar->playerConfig.MessageFilter, sizeof(uint32_t));
-    std::memcpy(&filters2, &PChar->playerConfig.MessageFilter2, sizeof(uint32_t));
+    const auto filters1 = std::bit_cast<uint32_t>(PChar->playerConfig.MessageFilter);
+    const auto filters2 = std::bit_cast<uint32_t>(PChar->playerConfig.MessageFilter2);
 
     db::preparedStmt("UPDATE chars "
                      "SET "
