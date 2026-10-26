@@ -79,7 +79,7 @@ auto CPetEntity::getPetType() const -> PET_TYPE
     return m_PetType;
 }
 
-auto CPetEntity::getSpawnLevel() -> uint8
+auto CPetEntity::getSpawnLevel() const -> uint8
 {
     return m_spawnLevel;
 }
@@ -137,37 +137,28 @@ void CPetEntity::setJugDuration(timer::duration seconds)
     m_jugDuration = seconds;
 }
 
-auto CPetEntity::GetScriptName() -> const std::string
+auto CPetEntity::GetScriptName() const -> std::string
 {
     switch (getPetType())
     {
         case PET_TYPE::AVATAR:
             return "avatar";
-            break;
         case PET_TYPE::WYVERN:
             return "wyvern";
-            break;
         case PET_TYPE::JUG_PET:
             return "jug";
-            break;
         case PET_TYPE::CHARMED_MOB:
             return "charmed";
-            break;
         case PET_TYPE::AUTOMATON:
             return "automaton";
-            break;
         case PET_TYPE::ADVENTURING_FELLOW:
             return "fellow";
-            break;
         case PET_TYPE::CHOCOBO:
             return "chocobo";
-            break;
         case PET_TYPE::LUOPAN:
             return "luopan";
-            break;
         default:
             return "";
-            break;
     }
 }
 

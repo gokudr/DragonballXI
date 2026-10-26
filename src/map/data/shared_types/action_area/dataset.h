@@ -1,7 +1,7 @@
 /*
 ===========================================================================
 
-  Copyright (c) 2010-2015 Darkstar Dev Teams
+  Copyright (c) 2026 LandSandBoat Dev Teams
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -21,36 +21,33 @@
 
 #pragma once
 
-#include "common/cbasetypes.h"
+#include "data/enums/action_target.h"
+#include "data/enums/cone_origin.h"
+#include "data/enums/sphere_origin.h"
 
-#include "item.h"
+#include <variant>
 
-class CItemShop : public CItem
+namespace xi::data
 {
-public:
-    CItemShop(uint16);
 
-    CItemShop(const CItemShop& other);
-    virtual ~CItemShop();
+// Who an action can be used on, and the area it reaches from there. Shared by every kind of action.
 
-    auto getMinPrice() const -> uint32;
-    auto getMaxPrice() const -> uint32;
-
-    auto IsInMenu() -> bool;
-    auto IsDailyIncrease() const -> bool;
-
-    void setMinPrice(uint32 price);
-    void setMaxPrice(uint32 price);
-    void setDailyIncrease(uint16 quantity);
-    auto getDailyIncrease() const -> uint16;
-    void setInitialQuantity(uint16 quantity);
-    auto getInitialQuantity() const -> uint16;
-    auto getSellPrice() -> uint16;
-
-private:
-    uint32 m_MinPrice;
-    uint32 m_MaxPrice;
-
-    uint16 m_DailyIncrease;
-    uint16 m_InitialQuantity;
+struct AoeSphereData
+{
+    xi::SphereOrigin Origin{};
+    float            Radius{};
 };
+
+struct AoeConeData
+{
+    xi::ConeOrigin Origin{};
+    float          Distance{};
+};
+
+struct AoeData
+{
+    xi::ActionTarget                         Affects{};
+    std::variant<AoeSphereData, AoeConeData> Shape{};
+};
+
+} // namespace xi::data
