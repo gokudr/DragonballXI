@@ -84,6 +84,7 @@
 #include "ability.h"
 #include "action/action.h"
 #include "battlefield.h"
+#include "besieged_system.h"
 #include "conquest_system.h"
 #include "daily_system.h"
 #include "data/datasets/zones/mobs/dataset.h"
@@ -330,6 +331,7 @@ void init(IPP mapIPP, bool isRunningInCI)
     lua.set_function("GetRegionInfluence", &luautils::GetRegionInfluence);
     lua.set_function("GetNationRank", &luautils::GetNationRank);
     lua.set_function("GetConquestBalance", &luautils::GetConquestBalance);
+    lua.set_function("AddImperialDefense", &besieged::AddImperialDefense);
     lua.set_function("IsConquestAlliance", &luautils::IsConquestAlliance);
     lua.set_function("SpawnMob", &luautils::SpawnMob);
     lua.set_function("DespawnMob", &luautils::DespawnMob);
@@ -2659,7 +2661,7 @@ void OnGameIn(CCharEntity* PChar, bool zoning)
     // You can DC in the intro CS when logging in and your playtime is non-zero
     // However, in charCreate, it adds NEW_ADVENTURER title. so lets check that to determine if charCreate needs to be called
     // `xi.player.onGameIn` calls `xi.player.charCreate` when the 2nd param is true
-    bool needsFirstLogin = !charutils::hasTitle(PChar, 206); // 206 == xi.title.NEW_ADVENTURER
+    bool needsFirstLogin = !charutils::hasTitle(PChar, xi::Title::NewAdventurer);
 
     callGlobal<void>("xi.player.onGameIn", PChar, needsFirstLogin, zoning);
 }
@@ -4253,6 +4255,11 @@ void OnMobDeath(CBaseEntity* PMob, CBaseEntity* PKiller)
 
                     PChar->eventPreparation->targetEntity = PMob;
                     PChar->eventPreparation->scriptFile   = filename;
+
+                    if (const auto title = static_cast<CMobEntity*>(PMob)->m_Title; title != xi::Title::None)
+                    {
+                        charutils::setTitle(PMember, title);
+                    }
 
                     // onMobDeath(mob, player, optParams)
                     auto result = onMobDeathFramework(PMob, PMember, optParams, onMobDeath);
@@ -6058,21 +6065,17 @@ void OnFurniturePlaced(CCharEntity* PChar, CItemFurnishing* PItem)
 {
     TracyZoneScoped;
 
-    auto name = PItem->getName();
+    auto filename = fmt::format("./scripts/items/{}.lua", PItem->getName());
 
-    auto onFurniturePlaced = lua["xi"]["items"][name]["onFurniturePlaced"];
-    if (!onFurniturePlaced.valid())
-    {
-        return;
-    }
+    auto onFurniturePlacedFramework = lua["InteractionGlobal"]["onFurniturePlaced"];
+    auto onFurniturePlaced          = getCachedFileFunction(filename, "onFurniturePlaced");
 
-    auto result = onFurniturePlaced(PChar);
+    auto result = onFurniturePlacedFramework(PChar, PItem, onFurniturePlaced);
     if (!result.valid())
     {
         sol::error err = result;
-        ShowError("luautils::onFurniturePlaced: %s", err.what());
+        ShowError("luautils::OnFurniturePlaced: %s", err.what());
         ReportErrorToPlayer(PChar, err.what());
-        return;
     }
 }
 
@@ -6080,21 +6083,17 @@ void OnFurnitureRemoved(CCharEntity* PChar, CItemFurnishing* PItem)
 {
     TracyZoneScoped;
 
-    auto name = PItem->getName();
+    auto filename = fmt::format("./scripts/items/{}.lua", PItem->getName());
 
-    auto onFurnitureRemoved = lua["xi"]["items"][name]["onFurnitureRemoved"];
-    if (!onFurnitureRemoved.valid())
-    {
-        return;
-    }
+    auto onFurnitureRemovedFramework = lua["InteractionGlobal"]["onFurnitureRemoved"];
+    auto onFurnitureRemoved          = getCachedFileFunction(filename, "onFurnitureRemoved");
 
-    auto result = onFurnitureRemoved(PChar);
+    auto result = onFurnitureRemovedFramework(PChar, PItem, onFurnitureRemoved);
     if (!result.valid())
     {
         sol::error err = result;
-        ShowError("luautils::onFurnitureRemoved: %s", err.what());
+        ShowError("luautils::OnFurnitureRemoved: %s", err.what());
         ReportErrorToPlayer(PChar, err.what());
-        return;
     }
 }
 
